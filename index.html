@@ -136,9 +136,25 @@
     refresh();
 
     const status=document.getElementById('status');
-    viewer.addEventListener('load',()=>{status.hidden=true;updateMarkers();});
-    viewer.addEventListener('error',e=>{status.hidden=false;status.textContent='Could not load the 3D model. Check that John_R_Park_Building.glb is uploaded beside index.html and that the filename matches exactly.';console.error(e);});
-    setTimeout(()=>{if(!viewer.modelIsVisible){status.hidden=false;status.textContent='Still loading. If this persists, check your internet connection and confirm the GLB filename matches exactly.';}},20000);
+    let modelLoaded=false;
+    function finishLoading(){
+      modelLoaded=true;
+      status.hidden=true;
+      try{updateMarkers();}catch(e){console.warn('Marker update:',e);}
+    }
+    viewer.addEventListener('load',finishLoading);
+    if(viewer.loaded) finishLoading();
+    viewer.addEventListener('error',e=>{
+      if(modelLoaded)return;
+      status.hidden=false;
+      status.textContent='Could not load the 3D model. Check that John_R_Park_Building.glb is uploaded beside index.html and that the filename matches exactly.';
+      console.error(e);
+    });
+    setTimeout(()=>{
+      if(modelLoaded||viewer.loaded){finishLoading();return;}
+      status.hidden=false;
+      status.textContent='Still loading. If this persists, check your internet connection and confirm the GLB filename matches exactly.';
+    },20000);
     document.getElementById('reset').addEventListener('click',()=>{stopSpin();goSelect.value='';viewer.cameraOrbit='0deg 78deg 165m';viewer.cameraTarget='0m 23m 0m';viewer.fieldOfView='35deg';});
     document.getElementById('spin').addEventListener('click',e=>{viewer.autoRotate=!viewer.autoRotate;e.currentTarget.setAttribute('aria-pressed',String(viewer.autoRotate));e.currentTarget.textContent=viewer.autoRotate?'Stop rotation':'Auto-rotate';});
     document.getElementById('fullscreen').addEventListener('click',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else if(viewer.requestFullscreen)await viewer.requestFullscreen();else status.textContent='Full screen is not supported by this browser.';}catch(e){console.warn(e);}});
