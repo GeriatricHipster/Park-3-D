@@ -27,7 +27,19 @@
 </head>
 <body>
   <header><h1>John R. Park Building</h1><p>Interactive 3D building model · Drag to rotate · Pinch or scroll to zoom</p></header>
-  <model-viewer id="building" src="./John_R_Park_Building.glb" alt="Interactive 3D rendering of the John R. Park Building" camera-controls touch-action="pan-y" shadow-intensity="1" exposure="1" interaction-prompt="auto" loading="eager" reveal="auto">
+ <model-viewer
+  id="building"
+  src="./John_R_Park_Building.glb"
+  alt="Interactive 3D rendering of the John R. Park Building"
+  camera-controls
+  touch-action="pan-y"
+  min-camera-orbit="auto auto 0.1m"
+  max-camera-orbit="auto auto 1000m"
+  shadow-intensity="1"
+  exposure="1"
+  interaction-prompt="auto"
+  loading="eager"
+  reveal="auto">
   </model-viewer>
   <div id="status" role="status">Loading 3D building…</div>
   <aside id="cam-panel" class="cam-panel" hidden><div class="row"><h2>Camera placement</h2><button id="close-cam">Close</button></div><label>Selected camera<select id="cam-select"></select></label><div id="cam-info"></div><div class="row"><label>X<input id="cam-x" type="number" step="0.1"></label><label>Height<input id="cam-y" type="number" step="0.1"></label><label>Z<input id="cam-z" type="number" step="0.1"></label></div><div class="row"><button id="cam-save">Save on this device</button><button id="cam-reset">Reset original</button></div><small>Original proposed camera locations. Marker positions are editable on this device; edits are not shared with other visitors until incorporated into the website. Coverage cones and physical camera meshes are not included in this version.</small></aside>
