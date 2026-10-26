@@ -5,7 +5,153 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#182433">
   <title>John R. Park Building | Interactive 3D</title>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@go<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#182433">
+  <title>John R. Park Building | Interactive 3D</title>
   <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+  <style>
+    *{box-sizing:border-box}html,body{height:100%;margin:0}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#dce4ea;color:#172638}
+    header{position:absolute;z-index:2;top:env(safe-area-inset-top,12px);left:12px;right:12px;max-width:430px;background:#182433ee;color:#fff;padding:15px 18px;border-radius:12px;box-shadow:0 4px 24px #0002;pointer-events:none}
+    h1{font-size:1.1rem;margin:0 0 5px}header p{font-size:.8rem;line-height:1.4;margin:0;color:#d5dce4}
+    model-viewer{display:block;width:100%;height:100%;background:linear-gradient(#b9c9d7,#edf1f4);--progress-bar-color:#cda65a}
+    .bottom{position:absolute;z-index:2;bottom:calc(16px + env(safe-area-inset-bottom));left:12px;right:12px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+    button{border:0;border-radius:8px;padding:12px 16px;background:#182433;color:white;font-size:14px;font-weight:600;cursor:pointer}
+    #status{position:absolute;z-index:3;left:12px;right:12px;top:50%;transform:translateY(-50%);margin:auto;max-width:420px;padding:14px;border-radius:10px;background:#fffef5;color:#172638;text-align:center;box-shadow:0 5px 24px #0002}
+    #status[hidden]{display:none}
+    @media(max-width:600px){header{max-width:none}header p{font-size:.73rem}}
+
+    .camera{position:relative;border:2px solid white;border-radius:999px;background:#e3b343;color:#101820;padding:7px 10px;font-weight:800;font-size:12px;box-shadow:0 2px 12px #0008;cursor:pointer;white-space:nowrap}
+    .camera.m{background:#73d4ed}.camera.p{background:#a5e785}
+    .camera[hidden]{display:none}
+    .cam-panel{position:absolute;z-index:4;right:12px;top:12px;width:min(310px,calc(100vw - 24px));max-height:65vh;overflow:auto;background:#182433ed;color:white;border-radius:12px;padding:12px;box-shadow:0 4px 18px #0004}
+    .cam-panel h2{font-size:15px;margin:0 0 8px}.cam-panel label{display:block;font-size:12px;margin:7px 0}.cam-panel input,.cam-panel select{width:100%;padding:7px;border-radius:6px;border:0}.cam-panel .row{display:flex;gap:6px}.cam-panel .row>*{flex:1}.cam-panel button{padding:8px;font-size:12px;background:#38526c}.cam-panel small{color:#ccd6e2}.cam-panel[hidden]{display:none}
+    .camera.is-hidden{display:none!important}
+    .nav-panel{position:absolute;z-index:3;left:12px;top:112px;max-width:min(300px,calc(100vw - 24px));background:#182433eb;color:white;border-radius:12px;padding:12px;box-shadow:0 4px 18px #0003}
+    .nav-panel h2{font-size:14px;margin:0 0 8px}
+    .nav-panel .row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:7px}
+    .nav-panel button{padding:8px 10px;font-size:12px;background:#38526c}
+    .nav-panel select{width:100%;padding:9px;border:0;border-radius:7px;font-size:13px}
+    .nav-panel small{display:block;margin-top:7px;color:#d5dce4;line-height:1.35}
+    @media(max-width:600px){.nav-panel{top:80px;left:8px;padding:8px;max-width:210px}.nav-panel button{padding:7px;font-size:11px}.nav-panel h2{font-size:12px}}
+    @media(max-width:600px){.cam-panel{top:auto;bottom:90px;max-height:42vh}header{right:12px}.bottom button{padding:10px 12px}}
+  </style>
+</head>
+<body>
+  <header><h1>John R. Park Building</h1><p>Interactive 3D building model · Drag to rotate · Pinch or scroll to zoom</p></header>
+  <model-viewer id="building" src="./John_R_Park_Building.glb" alt="Interactive 3D rendering of the John R. Park Building" camera-controls touch-action="pan-y" min-camera-orbit="auto auto 0.1m" max-camera-orbit="auto auto 1000m" interpolation-decay="200" zoom-sensitivity="0.15" pan-sensitivity="0.5" orbit-sensitivity="0.6" shadow-intensity="1" exposure="1" interaction-prompt="auto" loading="eager" reveal="auto">
+  </model-viewer>
+  <section class="nav-panel" aria-label="Guided building navigation"><h2>Explore the building</h2><div class="row"><button data-view="front">Front</button><button data-view="right">Right</button><button data-view="rear">Rear</button><button data-view="left">Left</button></div><label for="go-camera" style="font-size:12px">Go to a camera</label><select id="go-camera"><option value="">Choose camera…</option></select><small>Markers appear only on the side facing you. Select a marker or use this menu for a guided close-up.</small></section>
+  <div id="status" role="status">Loading 3D building…</div>
+  <aside id="cam-panel" class="cam-panel" hidden><div class="row"><h2>Camera placement</h2><button id="close-cam">Close</button></div><label>Selected camera<select id="cam-select"></select></label><div id="cam-info"></div><div class="row"><label>X<input id="cam-x" type="number" step="0.1"></label><label>Height<input id="cam-y" type="number" step="0.1"></label><label>Z<input id="cam-z" type="number" step="0.1"></label></div><div class="row"><button id="cam-save">Save on this device</button><button id="cam-reset">Reset original</button></div><small>Original proposed camera locations. Marker positions are editable on this device; edits are not shared with other visitors until incorporated into the website. Coverage cones and physical camera meshes are not included in this version.</small></aside>
+  <div class="bottom"><button id="cameras" type="button">Cameras (8)</button><button id="toggle-cameras" type="button">Hide markers</button><button id="reset" type="button">Reset view</button><button id="spin" type="button" aria-pressed="false">Auto-rotate</button><button id="fullscreen" type="button">Full screen</button></div>
+  <script>
+    const viewer=document.getElementById('building');
+
+    // Restored from the original proposed camera layout (world-space coordinates).
+    const originals=[
+      {id:1,type:'q',model:'AXIS Q1809-LE',p:[-47.4,31.6,23.55],pan:16.5,tilt:38},
+      {id:2,type:'q',model:'AXIS Q1809-LE',p:[47.4,31.6,23.55],pan:-16.5,tilt:38},
+      {id:3,type:'m',model:'AXIS M2048-LE',p:[-43,14.8,24],pan:0,tilt:56},
+      {id:4,type:'m',model:'AXIS M2048-LE',p:[44.3,14.8,24],pan:0,tilt:56},
+      {id:5,type:'p',model:'AXIS P4708-PLVE',p:[-62.4,32.3,18.4],pan:0,tilt:24},
+      {id:6,type:'p',model:'AXIS P4708-PLVE',p:[62.4,32.3,22.4],pan:0,tilt:24},
+      {id:7,type:'p',model:'AXIS P4708-PLVE',p:[59.5,21.2,-24],pan:0,tilt:24},
+      {id:8,type:'m',model:'AXIS M2048-LE',p:[-59.5,19,-24],pan:0,tilt:50}
+    ];
+    const key='jrpark-modelviewer-markers-v1';
+    let cameras=originals.map(c=>({...c,p:[...c.p]}));
+    try{const saved=JSON.parse(localStorage.getItem(key)||'null');if(Array.isArray(saved)&&saved.length===8)cameras=saved;}catch(e){}
+    const panel=document.getElementById('cam-panel'), select=document.getElementById('cam-select');
+    const goSelect=document.getElementById('go-camera');
+    let selected=1, visible=true;
+    for(const c of cameras){
+      const b=document.createElement('button');b.type='button';b.className='camera '+c.type;b.slot='hotspot-cam'+c.id;b.dataset.position=c.p.map(n=>n+'m').join(' ');b.dataset.visibilityAttribute='visible';b.textContent='CAM '+c.id;
+      b.title=c.model+' — navigate to camera';b.addEventListener('click',()=>goToCamera(c.id));viewer.appendChild(b);
+      const o=document.createElement('option');o.value=c.id;o.textContent='CAM '+c.id+' — '+c.model;select.appendChild(o);const go=o.cloneNode(true);goSelect.appendChild(go);
+    }
+    // Camera groups reflect the proposed mounting faces, not measured visibility/occlusion.
+    const faceById={1:'front',2:'front',3:'front',4:'front',5:'left',6:'right',7:'rear',8:'rear'};
+    const views={front:{theta:0,normal:[0,1]},right:{theta:90,normal:[1,0]},rear:{theta:180,normal:[0,-1]},left:{theta:-90,normal:[-1,0]}};
+    function activeFaces(){
+      const theta=viewer.getCameraOrbit().theta;
+      const direction=[Math.sin(theta),Math.cos(theta)];
+      return Object.keys(views).filter(face=>{
+        const n=views[face].normal;
+        return direction[0]*n[0]+direction[1]*n[1]>0.55;
+      });
+    }
+    function updateMarkers(){
+      const faces=activeFaces();
+      for(const c of cameras){
+        const el=viewer.querySelector('[slot="hotspot-cam'+c.id+'"]');
+        el.classList.toggle('is-hidden',!visible||!faces.includes(faceById[c.id]));
+      }
+    }
+    function stopSpin(){
+      viewer.autoRotate=false;
+      const btn=document.getElementById('spin');
+      btn.setAttribute('aria-pressed','false');btn.textContent='Auto-rotate';
+    }
+    function goToCamera(id){
+      const c=cameras.find(x=>x.id===Number(id));if(!c)return;
+      selected=c.id;refresh();goSelect.value=String(c.id);
+      stopSpin();
+      const face=faceById[c.id],v=views[face];
+      // Frame the mounting area, not the exact hotspot, for a comfortable overview.
+      const target=[c.p[0],Math.max(0,c.p[1]-4),c.p[2]];
+      viewer.cameraTarget=target.map(n=>n+'m').join(' ');
+      viewer.cameraOrbit=v.theta+'deg 78deg 42m';
+      viewer.fieldOfView='35deg';
+      updateMarkers();
+    }
+    function goToSide(face){
+      stopSpin();goSelect.value='';
+      const v=views[face];
+      // Model's decorative approach extends far beyond the building, so use
+      // an explicit target near the building instead of auto bounding-box center.
+      viewer.cameraTarget='0m 23m 0m';
+      viewer.cameraOrbit=v.theta+'deg 78deg 160m';
+      viewer.fieldOfView='35deg';
+    }
+    document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>goToSide(b.dataset.view)));
+    goSelect.addEventListener('change',()=>{if(goSelect.value)goToCamera(goSelect.value)});
+    viewer.addEventListener('camera-change',updateMarkers);
+    function refresh(){const c=cameras.find(c=>c.id===selected);select.value=selected;
+      document.getElementById('cam-info').textContent=c.model+' · Pan '+c.pan+'° · Tilt '+c.tilt+'°';
+      ['x','y','z'].forEach((axis,i)=>document.getElementById('cam-'+axis).value=c.p[i]);
+    }
+    select.addEventListener('change',()=>{selected=Number(select.value);refresh();});
+    document.getElementById('cameras').onclick=()=>{panel.hidden=!panel.hidden;refresh();};
+    document.getElementById('close-cam').onclick=()=>panel.hidden=true;
+    document.getElementById('toggle-cameras').onclick=e=>{visible=!visible;updateMarkers();e.target.textContent=visible?'Hide markers':'Show markers';};
+    document.getElementById('cam-save').onclick=()=>{
+      const c=cameras.find(c=>c.id===selected);const p=['x','y','z'].map(a=>Number(document.getElementById('cam-'+a).value));
+      if(p.some(v=>!Number.isFinite(v)))return alert('Enter valid coordinates.');
+      c.p=p;viewer.querySelector('[slot="hotspot-cam'+selected+'"]').dataset.position=p.join(' ')+'m';
+      try{localStorage.setItem(key,JSON.stringify(cameras));}catch(e){}refresh();updateMarkers();
+    };
+    document.getElementById('cam-reset').onclick=()=>{
+      const orig=originals.find(c=>c.id===selected), c=cameras.find(c=>c.id===selected);c.p=[...orig.p];
+      viewer.querySelector('[slot="hotspot-cam'+selected+'"]').dataset.position=c.p.map(n=>n+'m').join(' ');
+      try{localStorage.setItem(key,JSON.stringify(cameras));}catch(e){}refresh();updateMarkers();
+    };
+    refresh();updateMarkers();
+
+    const status=document.getElementById('status');
+    viewer.addEventListener('load',()=>{status.hidden=true;updateMarkers();});
+    viewer.addEventListener('error',e=>{status.hidden=false;status.textContent='Could not load the 3D model. Check that John_R_Park_Building.glb is uploaded beside index.html and that the filename matches exactly.';console.error(e);});
+    setTimeout(()=>{if(!viewer.modelIsVisible){status.hidden=false;status.textContent='Still loading. If this persists, check your internet connection and confirm the GLB filename matches exactly.';}},20000);
+    document.getElementById('reset').addEventListener('click',()=>{stopSpin();goSelect.value='';viewer.cameraOrbit='0deg 78deg 165m';viewer.cameraTarget='0m 23m 0m';viewer.fieldOfView='35deg';});
+    document.getElementById('spin').addEventListener('click',e=>{viewer.autoRotate=!viewer.autoRotate;e.currentTarget.setAttribute('aria-pressed',String(viewer.autoRotate));e.currentTarget.textContent=viewer.autoRotate?'Stop rotation':'Auto-rotate';});
+    document.getElementById('fullscreen').addEventListener('click',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else if(viewer.requestFullscreen)await viewer.requestFullscreen();else status.textContent='Full screen is not supported by this browser.';}catch(e){console.warn(e);}});
+  </script>
+</body>
+</html>
+ogle/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
   <style>
     *{box-sizing:border-box}html,body{height:100%;margin:0}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#dce4ea;color:#172638}
     header{position:absolute;z-index:2;top:env(safe-area-inset-top,12px);left:12px;right:12px;max-width:430px;background:#182433ee;color:#fff;padding:15px 18px;border-radius:12px;box-shadow:0 4px 24px #0002;pointer-events:none}
