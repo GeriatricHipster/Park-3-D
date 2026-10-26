@@ -70,6 +70,7 @@
     const faceById={1:'front',2:'front',3:'front',4:'front',5:'left',6:'right',7:'rear',8:'rear'};
     const views={front:{theta:0,normal:[0,1]},right:{theta:90,normal:[1,0]},rear:{theta:180,normal:[0,-1]},left:{theta:-90,normal:[-1,0]}};
     function activeFaces(){
+      if(typeof viewer.getCameraOrbit !== 'function') return ['front'];
       const theta=viewer.getCameraOrbit().theta;
       const direction=[Math.sin(theta),Math.cos(theta)];
       return Object.keys(views).filter(face=>{
@@ -132,7 +133,7 @@
       viewer.querySelector('[slot="hotspot-cam'+selected+'"]').dataset.position=c.p.map(n=>n+'m').join(' ');
       try{localStorage.setItem(key,JSON.stringify(cameras));}catch(e){}refresh();updateMarkers();
     };
-    refresh();updateMarkers();
+    refresh();
 
     const status=document.getElementById('status');
     viewer.addEventListener('load',()=>{status.hidden=true;updateMarkers();});
